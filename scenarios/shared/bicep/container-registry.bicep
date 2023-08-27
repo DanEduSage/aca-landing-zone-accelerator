@@ -169,8 +169,9 @@ var diagnosticsLogsSpecified = [for category in filter(diagnosticLogCategoriesTo
   category: category
   enabled: true
   retentionPolicy: {
-    enabled: true
-    days: diagnosticLogsRetentionInDays
+    // enabled: true
+    enabled: false
+      days: diagnosticLogsRetentionInDays
   }
 }]
 
@@ -178,8 +179,9 @@ var diagnosticsLogs = contains(diagnosticLogCategoriesToEnable, 'allLogs') ? [
   {
     categoryGroup: 'allLogs'
     enabled: true
-    retentionPolicy: {
-      enabled: true
+  retentionPolicy: {
+    // enabled: true
+    enabled: false
       days: diagnosticLogsRetentionInDays
     }
   }
@@ -190,7 +192,8 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   timeGrain: null
   enabled: true
   retentionPolicy: {
-    enabled: true
+    // enabled: true
+    enabled: false
     days: diagnosticLogsRetentionInDays
   }
 }]

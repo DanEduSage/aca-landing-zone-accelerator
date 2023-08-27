@@ -232,8 +232,9 @@ var diagnosticsLogs = contains(diagnosticLogCategoriesToEnable, 'allLogs') ? [
   {
     categoryGroup: 'allLogs'
     enabled: true
-    retentionPolicy: {
-      enabled: true
+  retentionPolicy: {
+    // enabled: true
+    enabled: false
       days: diagnosticLogsRetentionInDays
     }
   }

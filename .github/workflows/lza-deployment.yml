@@ -24,7 +24,7 @@ jobs:
   # The lint job performs linting on the bicep code
   lint:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -36,7 +36,7 @@ jobs:
         run: az bicep build --file ./scenarios/aca-internal/bicep/main.bicep
 
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [lint]
     steps:
       - uses: actions/checkout@v3
@@ -55,7 +55,7 @@ jobs:
           deploymentMode: Validate
 
   preview:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [lint, validate]
     steps:
       - uses: actions/checkout@v3
@@ -75,7 +75,7 @@ jobs:
               --parameters deployHelloWorldSample=false
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [preview]
     steps:
       - uses: actions/checkout@v3
@@ -98,7 +98,7 @@ jobs:
       hubResourceGroupName: ${{ steps.deployment.outputs.hubResourceGroupName }}
 
   teardown:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [deploy]
     env:
       ENABLE_TEARDOWN: true    

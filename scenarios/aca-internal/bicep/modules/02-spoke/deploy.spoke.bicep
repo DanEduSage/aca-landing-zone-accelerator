@@ -213,7 +213,7 @@ module nsgAppGw '../../../../shared/bicep/network/nsg.bicep' = if (!empty(spokeA
   }
 }
 
-@description('NSG Rules for the private enpoint subnet.')
+@description('NSG Rules for the private endpoint subnet.')
 module nsgPep '../../../../shared/bicep/network/nsg.bicep' = {
   name: take('nsgPep-${deployment().name}', 64)
   scope: spokeResourceGroup
