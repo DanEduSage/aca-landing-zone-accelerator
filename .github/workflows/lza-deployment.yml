@@ -91,11 +91,12 @@ jobs:
           scope: subscription
           region: ${{ vars.LOCATION }}
           template: ./scenarios/aca-internal/bicep/main.bicep
-          parameters: ./scenarios/aca-internal/bicep/main.parameters.jsonc deployHelloWorldSample=true
+          parameters: ./scenarios/aca-internal/bicep/main.parameters.jsonc deployHelloWorldSample=true environment=${{ vars.ENVIRONMENT }}
           failOnStdErr: false
     outputs:
       spokeResourceGroupName: ${{ steps.deployment.outputs.spokeResourceGroupName }}
       hubResourceGroupName: ${{ steps.deployment.outputs.hubResourceGroupName }}
+      jumpboxName: ${{ steps.deployment.outputs.jumpboxName }}
 
   teardown:
     runs-on: ubuntu-22.04
