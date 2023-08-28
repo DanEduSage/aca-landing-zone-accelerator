@@ -96,7 +96,7 @@ jobs:
     outputs:
       spokeResourceGroupName: ${{ steps.deployment.outputs.spokeResourceGroupName }}
       hubResourceGroupName: ${{ steps.deployment.outputs.hubResourceGroupName }}
-      jumpboxName: ${{ steps.deployment.outputs.jumpboxName }}
+      vmJumpboxName: ${{ steps.deployment.outputs.vmJumpboxName }}
 
   teardown:
     runs-on: ubuntu-22.04
@@ -142,4 +142,4 @@ jobs:
       with:
         azcliversion: 2.45.0
         inlineScript: |
-          az vm stop --resource-group ${{ needs.deploy.outputs.spokeResourceGroupName }} --name ${{ needs.deploy.outputs.jumpboxName }} --no-wait
+          az vm stop --resource-group ${{ needs.deploy.outputs.spokeResourceGroupName }} --name ${{ needs.deploy.outputs.vmJumpboxName }} --no-wait
