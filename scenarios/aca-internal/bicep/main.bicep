@@ -271,6 +271,9 @@ output spokeApplicationGatewaySubnetId string = spoke.outputs.spokeApplicationGa
 @description('The name of the Spoke Application Gateway Subnet.  If "spokeApplicationGatewaySubnetAddressPrefix" is empty, the subnet will not be created and the value returned is empty.')
 output spokeApplicationGatewaySubnetName string = spoke.outputs.spokeApplicationGatewaySubnetName
 
+@description('The name of the Spoke jumpbox VM.')
+output vmJumpboxName string = spoke.outputs.vmJumpboxName
+
 // Supporting Services
 @description('The resource ID of the container registry.')
 output containerRegistryId string = supportingServices.outputs.containerRegistryId

@@ -101,7 +101,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [deploy]
     env:
-      ENABLE_TEARDOWN: true    
+      ENABLE_TEARDOWN: true
+      ENABLE_STOP_JUMPBOX_AFTER_DEPLOYMENT: true    
     
     steps:
     - uses: trstringer/manual-approval@v1
@@ -119,7 +120,7 @@ jobs:
         additional-denied-words: ''
     
     - uses: azure/login@v1
-      if: vars.ENABLE_TEARDOWN == 'true'
+      if: vars.ENABLE_TEARDOWN == 'true' || vars.ENABLE_STOP_JUMPBOX_AFTER_DEPLOYMENT == 'true'
       name: Sign in to Azure
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -133,3 +134,11 @@ jobs:
           az group delete --name ${{ needs.deploy.outputs.spokeResourceGroupName }} --yes
           az group delete --name ${{ needs.deploy.outputs.hubResourceGroupName }} --yes
           az deployment sub delete --name "GitHubAction-${{ github.run_number }}" --no-wait
+
+    - uses: Azure/cli@v1
+      name: Run stop jumpbox after deployment
+      if: vars.ENABLE_TEARDOWN == 'false' && vars.STOP_JUMPBOX_AFTER_DEPLOYMENT == 'true'
+      with:
+        azcliversion: 2.45.0
+        inlineScript: |
+          az vm stop --resource-group ${{ needs.deploy.outputs.spokeResourceGroupName }} --name ${{ needs.deploy.outputs.jumpboxName }} --no-wait
