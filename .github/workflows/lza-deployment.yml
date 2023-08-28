@@ -24,7 +24,7 @@ jobs:
   # The lint job performs linting on the bicep code
   lint:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -36,7 +36,7 @@ jobs:
         run: az bicep build --file ./scenarios/aca-internal/bicep/main.bicep
 
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [lint]
     steps:
       - uses: actions/checkout@v3
@@ -55,7 +55,7 @@ jobs:
           deploymentMode: Validate
 
   preview:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [lint, validate]
     steps:
       - uses: actions/checkout@v3
@@ -75,7 +75,7 @@ jobs:
               --parameters deployHelloWorldSample=false
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [preview]
     steps:
       - uses: actions/checkout@v3
@@ -91,17 +91,19 @@ jobs:
           scope: subscription
           region: ${{ vars.LOCATION }}
           template: ./scenarios/aca-internal/bicep/main.bicep
-          parameters: ./scenarios/aca-internal/bicep/main.parameters.jsonc deployHelloWorldSample=true
+          parameters: ./scenarios/aca-internal/bicep/main.parameters.jsonc deployHelloWorldSample=true environment=${{ vars.ENVIRONMENT }}
           failOnStdErr: false
     outputs:
       spokeResourceGroupName: ${{ steps.deployment.outputs.spokeResourceGroupName }}
       hubResourceGroupName: ${{ steps.deployment.outputs.hubResourceGroupName }}
+      vmJumpboxName: ${{ steps.deployment.outputs.vmJumpboxName }}
 
   teardown:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [deploy]
     env:
-      ENABLE_TEARDOWN: true    
+      ENABLE_TEARDOWN: true
+      ENABLE_STOP_JUMPBOX_AFTER_DEPLOYMENT: true    
     
     steps:
     - uses: trstringer/manual-approval@v1
@@ -110,7 +112,7 @@ jobs:
       with:
         secret: ${{ github.TOKEN }}
         timeout-minutes: 120
-        approvers: thotheod,aarthiem,kpantos
+        approvers: mikejwhat,DanEduSage,jamesedusage
         minimum-approvals: 1
         issue-title: "Deployed ACA-LZA GitHubAction-${{ github.run_number }}"
         issue-body: "Please approve or deny the tear-down of deployment GitHubAction-${{ github.run_number }}"
@@ -119,7 +121,7 @@ jobs:
         additional-denied-words: ''
     
     - uses: azure/login@v1
-      if: vars.ENABLE_TEARDOWN == 'true'
+      if: vars.ENABLE_TEARDOWN == 'true' || vars.ENABLE_STOP_JUMPBOX_AFTER_DEPLOYMENT == 'true'
       name: Sign in to Azure
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
@@ -133,3 +135,11 @@ jobs:
           az group delete --name ${{ needs.deploy.outputs.spokeResourceGroupName }} --yes
           az group delete --name ${{ needs.deploy.outputs.hubResourceGroupName }} --yes
           az deployment sub delete --name "GitHubAction-${{ github.run_number }}" --no-wait
+
+    - uses: Azure/cli@v1
+      name: Run stop jumpbox after deployment
+      if: vars.ENABLE_TEARDOWN != 'true' && vars.ENABLE_STOP_JUMPBOX_AFTER_DEPLOYMENT == 'true'
+      with:
+        azcliversion: 2.45.0
+        inlineScript: |
+          az vm stop --resource-group ${{ needs.deploy.outputs.spokeResourceGroupName }} --name ${{ needs.deploy.outputs.vmJumpboxName }} --no-wait

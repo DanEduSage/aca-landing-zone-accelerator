@@ -13,7 +13,7 @@ param workloadName string = 'aca-lza'
 param environment string = 'test'
 
 @description('The location where the resources will be created.')
-param location string =  deployment().location
+param location string = deployment().location
 
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
@@ -72,8 +72,8 @@ param spokeInfraSubnetAddressPrefix string
 @description('CIDR of the Spoke Private Endpoints Subnet.')
 param spokePrivateEndpointsSubnetAddressPrefix string
 
-@description('CIDR of the Spoke Application Gateway Subnet.')
-param spokeApplicationGatewaySubnetAddressPrefix string
+// @description('CIDR of the Spoke Application Gateway Subnet.')
+// param spokeApplicationGatewaySubnetAddressPrefix string
 
 @description('Enable or disable the createion of Application Insights.')
 param enableApplicationInsights bool
@@ -84,14 +84,14 @@ param enableDaprInstrumentation bool
 @description('Enable or disable the deployment of the Hello World Sample App. If disabled, the Application Gateway will not be deployed.')
 param deployHelloWorldSample bool
 
-@description('The FQDN of the Application Gateway. Must match the TLS Certificate.')
-param applicationGatewayFqdn string
+// @description('The FQDN of the Application Gateway. Must match the TLS Certificate.')
+// param applicationGatewayFqdn string
 
-@description('Enable or disable Application Gateway Certificate (PFX).')
-param enableApplicationGatewayCertificate bool
+// @description('Enable or disable Application Gateway Certificate (PFX).')
+// param enableApplicationGatewayCertificate bool
 
-@description('The name of the certificate key to use for Application Gateway certificate.')
-param applicationGatewayCertificateKeyName string
+// @description('The name of the certificate key to use for Application Gateway certificate.')
+// param applicationGatewayCertificateKeyName string
 
 @description('Enable usage and telemetry feedback to Microsoft.')
 param enableTelemetry bool = true
@@ -99,19 +99,19 @@ param enableTelemetry bool = true
 @description('Optional, default value is false. If true, Azure Cache for Redis (Premium SKU), together with Private Endpoint and the relavant Private DNS Zone will be deployed')
 param deployRedisCache bool = false
 
-@description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
-param deployZoneRedundantResources bool = true
+// @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
+// param deployZoneRedundantResources bool = true
 
 @description('Optional, default value is true. If true, Azure Policies will be deployed')
 param deployAzurePolicies bool = true
 
-@description('Optional. DDoS protection mode. see https://learn.microsoft.com/azure/ddos-protection/ddos-protection-sku-comparison#skus')
-@allowed([
-  'Enabled'
-  'Disabled'
-  'VirtualNetworkInherited'
-])
-param ddosProtectionMode string = 'Disabled'
+// @description('Optional. DDoS protection mode. see https://learn.microsoft.com/azure/ddos-protection/ddos-protection-sku-comparison#skus')
+// @allowed([
+//   'Enabled'
+//   'Disabled'
+//   'VirtualNetworkInherited'
+// ])
+// param ddosProtectionMode string = 'Disabled'
 
 // ------------------
 // VARIABLES
@@ -155,7 +155,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = {
     environment: environment
     workloadName: workloadName
     hubVNetId:  hub.outputs.hubVNetId
-    spokeApplicationGatewaySubnetAddressPrefix: spokeApplicationGatewaySubnetAddressPrefix
+    spokeApplicationGatewaySubnetAddressPrefix: '' //spokeApplicationGatewaySubnetAddressPrefix
     spokeInfraSubnetAddressPrefix: spokeInfraSubnetAddressPrefix
     spokePrivateEndpointsSubnetAddressPrefix: spokePrivateEndpointsSubnetAddressPrefix
     spokeVNetAddressPrefixes: spokeVNetAddressPrefixes
@@ -203,7 +203,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 }
 
-module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = if (deployHelloWorldSample) {
+module helloWorldSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = if (deployHelloWorldSample) {
   name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
   scope: spokeResourceGroup
   params: {
@@ -214,25 +214,25 @@ module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.
   }
 }
 
-module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = if (deployHelloWorldSample) {
-  name: take('applicationGateway-${deployment().name}-deployment', 64)
-  scope: spokeResourceGroup
-  params: {
-    location: location
-    tags: tags
-    environment: environment
-    workloadName: workloadName
-    applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
-    applicationGatewayFqdn: applicationGatewayFqdn
-    applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? helloWorlSampleApp.outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
-    applicationGatewaySubnetId: spoke.outputs.spokeApplicationGatewaySubnetId
-    enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
-    keyVaultId: supportingServices.outputs.keyVaultId
-    deployZoneRedundantResources: deployZoneRedundantResources
-    ddosProtectionMode: ddosProtectionMode
-    applicationGatewayLogAnalyticsId: spoke.outputs.logAnalyticsWorkspaceId
-  }
-}
+// module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = if (deployHelloWorldSample) {
+//   name: take('applicationGateway-${deployment().name}-deployment', 64)
+//   scope: spokeResourceGroup
+//   params: {
+//     location: location
+//     tags: tags
+//     environment: environment
+//     workloadName: workloadName
+//     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
+//     applicationGatewayFqdn: applicationGatewayFqdn
+//     applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? helloWorlSampleApp.outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
+//     applicationGatewaySubnetId: spoke.outputs.spokeApplicationGatewaySubnetId
+//     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
+//     keyVaultId: supportingServices.outputs.keyVaultId
+//     deployZoneRedundantResources: deployZoneRedundantResources
+//     ddosProtectionMode: ddosProtectionMode
+//     applicationGatewayLogAnalyticsId: spoke.outputs.logAnalyticsWorkspaceId
+//   }
+// }
 
 // ------------------
 // OUTPUTS
@@ -270,6 +270,9 @@ output spokeApplicationGatewaySubnetId string = spoke.outputs.spokeApplicationGa
 
 @description('The name of the Spoke Application Gateway Subnet.  If "spokeApplicationGatewaySubnetAddressPrefix" is empty, the subnet will not be created and the value returned is empty.')
 output spokeApplicationGatewaySubnetName string = spoke.outputs.spokeApplicationGatewaySubnetName
+
+@description('The name of the Spoke jumpbox VM.')
+output vmJumpboxName string = spoke.outputs.vmJumpboxName
 
 // Supporting Services
 @description('The resource ID of the container registry.')

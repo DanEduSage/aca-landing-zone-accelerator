@@ -116,7 +116,7 @@ module containerAppsEnvironment '../../../../shared/bicep/aca-environment.bicep'
     tags: tags
     logAnalyticsWsResourceId: logAnalyticsWorkspaceId
     subnetId: spokeVNet::infraSubnet.id
-    vnetEndpointInternal: true
+    vnetEndpointInternal: false
     appInsightsInstrumentationKey: (enableApplicationInsights && enableDaprInstrumentation) ? applicationInsights.outputs.appInsInstrumentationKey : ''
     zoneRedundant: deployZoneRedundantResources
   }
