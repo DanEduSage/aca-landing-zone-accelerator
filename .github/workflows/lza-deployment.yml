@@ -110,7 +110,7 @@ jobs:
       with:
         secret: ${{ github.TOKEN }}
         timeout-minutes: 120
-        approvers: thotheod,aarthiem,kpantos
+        approvers: mikejwhat,DanEduSage,jamesedusage
         minimum-approvals: 1
         issue-title: "Deployed ACA-LZA GitHubAction-${{ github.run_number }}"
         issue-body: "Please approve or deny the tear-down of deployment GitHubAction-${{ github.run_number }}"
