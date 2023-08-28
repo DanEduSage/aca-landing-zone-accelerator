@@ -138,7 +138,7 @@ jobs:
 
     - uses: Azure/cli@v1
       name: Run stop jumpbox after deployment
-      if: vars.ENABLE_TEARDOWN == 'false' && vars.STOP_JUMPBOX_AFTER_DEPLOYMENT == 'true'
+      if: vars.ENABLE_TEARDOWN != 'true' && vars.ENABLE_STOP_JUMPBOX_AFTER_DEPLOYMENT == 'true'
       with:
         azcliversion: 2.45.0
         inlineScript: |
